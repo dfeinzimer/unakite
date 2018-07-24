@@ -16,10 +16,11 @@ print "The server is ready to receive"
 print "SOCKET_control running on port", SOCKET_control.getsockname()[1]
 
 while 1:
-	connection = SOCKET_control.accept()
+	connection,addr = SOCKET_control.accept()
 	tmpBUFF = ""
+	data = ""
 	while len(data) != 40:
-		tmpBUFF = connection.receive(40)
+		tmpBUFF = connection.recv(40)
 		if not tmpBUFF:
 			break
 		data += tmpBUFF

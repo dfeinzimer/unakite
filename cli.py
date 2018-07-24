@@ -1,9 +1,9 @@
 from socket import *
 import commands
 
-serverName = localhsot
+serverName = 'localhost'
 serverPort = 12000
-clientSocket = socket(AFINET, SOCKSTREAM)
+clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
 
 data = "Hello world"
