@@ -1,6 +1,7 @@
 from socket import *
+import commands
 
-serverName = ecs.fullerton.edu
+serverName = localhsot
 serverPort = 12000
 clientSocket = socket(AFINET, SOCKSTREAM)
 clientSocket.connect((serverName, serverPort))

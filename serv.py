@@ -1,13 +1,30 @@
-import socket
+from socket import *
 import commands
 
-#Create socket for data transfer
-SOCKET_data = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serverPort = 12000
+
+#Create socket for control
+SOCKET_control = socket(AF_INET, SOCK_STREAM)
 
 #Bind to the lowest available port
-SOCKET_data.bind(('',0))
+SOCKET_control.bind(('',serverPort))
 
-print "SOCKET_data running on port", SOCKET_data.getsockname()[1]
+#Listen for inbound requests
+SOCKET_control.listen(1)
+
+print "The server is ready to receive"
+print "SOCKET_control running on port", SOCKET_control.getsockname()[1]
+
+while 1:
+	connection = SOCKET_control.accept()
+	tmpBUFF = ""
+	while len(data) != 40:
+		tmpBUFF = connection.receive(40)
+		if not tmpBUFF:
+			break
+		data += tmpBUFF
+	print data
+	connection.close()	
 
 #for line in commands.getstatusoutput('ls -l'):
 #	print line
