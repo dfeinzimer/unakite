@@ -40,4 +40,3 @@ while 1:
 			break
 	connection.close()	
 
-
