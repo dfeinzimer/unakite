@@ -19,6 +19,29 @@ SOCKET_control.listen(1)
 print "The server is ready to receive"
 print "SOCKET_control running on port", SOCKET_control.getsockname()[1]
 
+def recvAll(sock, numBytes):
+
+	# The buffer
+	recvBuff = ""
+
+	# The temporary buffer
+	tmpBuff = ""
+
+	# Keep receiving till all is received
+	while len(recvBuff) < numBytes:
+
+		# Attempt to receive bytes
+		tmpBuff =  sock.recv(numBytes)
+
+		# The other side has closed the socket
+		if not tmpBuff:
+			break
+
+		# Add the received bytes to the buffer
+		recvBuff += tmpBuff
+
+	return recvBuff
+
 def execute_control(data):
 	output = ""
 	for line in commands.getstatusoutput(data):
@@ -44,9 +67,27 @@ while 1:
 		output = execute_control(data)
 		connection.send(output)
 		data = ""
-	elif (data == 'put'):
-		print "request received"
+	elif (args[0] == 'put'):
+		print "Upload request received..."
+		dataSocket = socket(AF_INET, SOCK_STREAM)
+		dataSocket.bind(('',0))
+		# Retreive the ephemeral port number
+		print "Ephemeral Port:", dataSocket.getsockname()[1]
+		connection.send(str(dataSocket.getsockname()[1]))
+		dataSocket.listen(1)
+		while True:
+			incoming, addr = dataSocket.accept()
+			fileData = ""
+			recvBuff = ""
+			fileSize = 0
+			fileSizeBuff = ""
+			fileSizeBuff = recvAll(incoming, 10)
+			fileSize = int(fileSizeBuff)
+			print "The file size is ", fileSize
+			fileData = recvAll(incoming, fileSize)
+			print fileData
 	else:
 		print "data:", data
 
+incoming.close()
 connection.close()

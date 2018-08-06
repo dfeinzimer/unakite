@@ -37,16 +37,34 @@ while 1:
 		print result
 		continue
 	elif (args_split[0] == 'put'):
-		print "Server upload initiaded"
+		print "Server upload initiaded..."
 		fileName = args_split[1]
 		fileObj = open(fileName, "r")
 		# Create a data socket
 		dataSocket = socket(AF_INET, SOCK_STREAM)
-		# Bind the data socket to port 0
-		dataSocket.bind(('',0))
-		# Retreive the ephemeral port number
-		print "Ephemeral port opened:", dataSocket.getsockname()[1]
 		send_control(arg)
+		result = clientSocket.recv(10)
+		print "Assigned Ephemeral:", result
+		dataSocket.connect((serverName, result))
+		numSent = 0
+		fileData = None
+		while True:
+			# Read 65536 bytes of data
+			fileData = fileObj.read(65536)
+			# Make sure we did not hit EOF
+			if fileData:
+				dataSizeStr = str(len(fileData))
+				while len(dataSizeStr) < 10:
+					dataSizeStr = "0" + dataSizeStr
+				fileData = dataSizeStr + fileData
+				numSent = 0
+				while len(fileData) > numSent:
+					numSent += dataSocket.send(fileData[numSent:])
+			else:
+				break
+		print "Sent ", numSent, " bytes."
+		dataSocket.close()
+		fileObj.close()
 	elif (arg == 'quit'):
 		print "Disconnecting"
 		break
