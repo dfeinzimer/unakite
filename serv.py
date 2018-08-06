@@ -23,24 +23,30 @@ def execute_control(data):
 	output = ""
 	for line in commands.getstatusoutput(data):
 		output = output + str(line)
-	#Remove leading 0
+	# Remove leading 0
 	output = output[1:]
-	print "Output:", output
 	return output
 
+connection,addr = SOCKET_control.accept()
+
 while 1:
-	connection,addr = SOCKET_control.accept()
+
 	tmpBUFF = ""
 	data = ""
-	while len(data) != 40:
-		tmpBUFF = connection.recv(40)
-		if not tmpBUFF:
-			break
-		data += tmpBUFF
-		print data
-		if (data == 'ls'):
-			output = execute_control(data)
-			connection.send(output)
-			data = ""
-			break
-	connection.close()
+	tmpBUFF = connection.recv(40)
+	if not tmpBUFF:
+		break
+	data += tmpBUFF
+	args = data.split()
+	print "data:", data
+	print "args:", args
+	if (data == 'ls'):
+		output = execute_control(data)
+		connection.send(output)
+		data = ""
+	elif (data == 'put'):
+		print "request received"
+	else:
+		print "data:", data
+
+connection.close()
