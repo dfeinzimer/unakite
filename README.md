@@ -1,7 +1,13 @@
 # unakite
 Socket Programming
 
-V 2.0.
+Run server with:
+python serv.py <PORT #>
+
+Run client with:
+python cli.py localhost <PORT #>
+
+V 2.0.0
 ephemeral and put locked in
 
 V 1.0.5

@@ -53,7 +53,7 @@ def execute_control(data):
 connection,addr = SOCKET_control.accept()
 
 while 1:
-
+	args = []
 	tmpBUFF = ""
 	data = ""
 	tmpBUFF = connection.recv(40)
@@ -86,9 +86,46 @@ while 1:
 			print "The file size is ", fileSize
 			fileData = recvAll(incoming, fileSize)
 			print fileData
-			
+			filename = args[1]
+			if os.path.exists(filename):
+				append_write = 'a' #Append
+			else:
+				append_write = 'w' #Or make a new file
+			file = open(filename,append_write)
+			file.write(fileData)
+			file.close()
+	elif (args[0] == 'get'):
+		print "Download request received..."
+		fileName = args[1]
+		fileObj = open(fileName, "r")
+		dataSocket = socket(AF_INET, SOCK_STREAM)
+		dataSocket.bind(('',0))
+		dataSocket.listen(1)
+		# Retreive the ephemeral port number
+		print "Ephemeral Port:", dataSocket.getsockname()[1]
+		connection.send(str(dataSocket.getsockname()[1]))
+		numSent = 0
+		fileData = None
+		while True:
+			# Read 65536 bytes of data
+			fileData = fileObj.read(65536)
+			# Make sure we did not hit EOF
+			if fileData:
+				dataSizeStr = str(len(fileData))
+				while len(dataSizeStr) < 10:
+					dataSizeStr = "0" + dataSizeStr
+				fileData = dataSizeStr + fileData
+				numSent = 0
+				while len(fileData) > numSent:
+					numSent += dataSocket.send(fileData[numSent:])
+			else:
+				break
+		print "Sent", numSent, "bytes."
+
+		fileObj.close()
 	else:
 		print "data:", data
 
+dataSocket.close()
 incoming.close()
 connection.close()

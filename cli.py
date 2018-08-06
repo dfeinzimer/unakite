@@ -13,6 +13,29 @@ else:
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
 
+def recvAll(sock, numBytes):
+
+	# The buffer
+	recvBuff = ""
+
+	# The temporary buffer
+	tmpBuff = ""
+
+	# Keep receiving till all is received
+	while len(recvBuff) < numBytes:
+
+		# Attempt to receive bytes
+		tmpBuff =  sock.recv(numBytes)
+
+		# The other side has closed the socket
+		if not tmpBuff:
+			break
+
+		# Add the received bytes to the buffer
+		recvBuff += tmpBuff
+
+	return recvBuff
+
 def send_control(payload):
 	data = payload
 	bytesSent = 0
@@ -65,6 +88,33 @@ while 1:
 		print "Sent", numSent, "bytes."
 		dataSocket.close()
 		fileObj.close()
+	elif (args_split[0] == 'get'):
+		print "Server download request..."
+		# Create a data socket
+		dataSocket = socket(AF_INET, SOCK_STREAM)
+		send_control(arg)
+		result = clientSocket.recv(10)
+		print "Assigned Ephemeral:", result
+		dataSocket.connect((serverName, int(result)))
+		while True:
+			fileData = ""
+			recvBuff = ""
+			fileSize = 0
+			fileSizeBuff = ""
+			#fileSizeBuff = recvAll(dataSocket, 10)
+			fileSizeBuff = dataSocket.recv(10)
+			fileSize = int(fileSizeBuff)
+			print "The file size is ", fileSize
+			fileData = recvAll(dataSocket, fileSize)
+			print fileData
+			filename = args_split[1]
+			if os.path.exists(filename):
+				append_write = 'a' #Append
+			else:
+				append_write = 'w' #Or make a new file
+			file = open(filename,append_write)
+			file.write(fileData)
+			file.close()
 	elif (arg == 'quit'):
 		print "Disconnecting"
 		break
@@ -72,6 +122,5 @@ while 1:
 		print "Unrecognized command"
 		continue
 
-
-
+incoming.close()
 clientSocket.close()
