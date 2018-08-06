@@ -86,6 +86,7 @@ while 1:
 			print "The file size is ", fileSize
 			fileData = recvAll(incoming, fileSize)
 			print fileData
+			
 	else:
 		print "data:", data
 

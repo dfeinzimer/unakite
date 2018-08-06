@@ -45,7 +45,7 @@ while 1:
 		send_control(arg)
 		result = clientSocket.recv(10)
 		print "Assigned Ephemeral:", result
-		dataSocket.connect((serverName, result))
+		dataSocket.connect((serverName, int(result)))
 		numSent = 0
 		fileData = None
 		while True:
@@ -62,7 +62,7 @@ while 1:
 					numSent += dataSocket.send(fileData[numSent:])
 			else:
 				break
-		print "Sent ", numSent, " bytes."
+		print "Sent", numSent, "bytes."
 		dataSocket.close()
 		fileObj.close()
 	elif (arg == 'quit'):

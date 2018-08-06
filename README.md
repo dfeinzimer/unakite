@@ -1,6 +1,9 @@
 # unakite
 Socket Programming
 
+V 2.0.
+ephemeral and put locked in
+
 V 1.0.5
 ephemeral port achieved
 
